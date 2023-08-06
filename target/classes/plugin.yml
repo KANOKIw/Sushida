@@ -1,0 +1,20 @@
+main: "si.f5.mitminecraft.sushida.Main"
+name: "Sushida"
+version: "0.0.1"
+api-version: "1.14"
+
+commands:
+  typing:
+    aliases: ["."]
+    description: null
+    permission: Default
+    permission-message: "&cこのコマンドを使用する権限がありません！"
+  sushida:
+    description: Typing game
+    permission: Default
+    permission-message: "&cこのコマンドを使用する権限がありません！"
+  entyping:
+    aliases: ["_"]
+    description: Typing game
+    permission: Default
+    permission-message: "&cこのコマンドを使用する権限がありません！"
