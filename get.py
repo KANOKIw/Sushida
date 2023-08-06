@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup
 import json
 
 url = "https://e-akane.com/blog/post-18198/"
-list = []
-
 
 def get(url):
     d = 1
@@ -22,7 +20,7 @@ def get(url):
         return []
 
 if __name__ == "__main__":
-    sentences = get(url)
+    list = get(url)
 
     with open(r"src\main\java\si\f5\mitminecraft\sushida\sushis.json", "w", encoding="utf-8") as f:
-        json.dump(sentences, f, indent=4, ensure_ascii=False)
+        json.dump(list, f, indent=4, ensure_ascii=False)
