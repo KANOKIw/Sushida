@@ -1040,6 +1040,10 @@ public class Sushida implements CommandExecutor, TabCompleter {
             l.add("thi");
         } else if (hira.equals("てぇ")){
             l.add("the");
+        } else if (hira.equals("うぃ")){
+            l.add("wi");
+        } else if (hira.equals("うぇ")){
+            l.add("we");
         } else if (hira.equals("！")){
             l.add("!");
         } else if (hira.equals("？")){
