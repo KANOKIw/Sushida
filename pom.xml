@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>si.f5.mitminecraft.sushida</groupId>
   <artifactId>Sushida</artifactId>
-  <version>0.0.5</version>
+  <version>0.0.6</version>
   <name>Sushida</name>
   <build>
    <plugins>
