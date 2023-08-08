@@ -22,5 +22,5 @@ def get(url):
 if __name__ == "__main__":
     list = get(url)
 
-    with open(r"src\main\java\si\f5\mitminecraft\sushida\sushis.json", "w", encoding="utf-8") as f:
+    with open(r"src\main\java\si\f5\mitminecraft\resources\sushis.json", "w", encoding="utf-8") as f:
         json.dump(list, f, indent=4, ensure_ascii=False)
