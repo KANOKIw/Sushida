@@ -173,7 +173,6 @@ public class Start implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args){
         List<String> _candidates = new ArrayList<String>();
         if (args.length == 1){
-            _candidates.add("get");
             if (Sushida.isPlaying(sender.getName())){
                 _candidates.add("end");
             } else {
