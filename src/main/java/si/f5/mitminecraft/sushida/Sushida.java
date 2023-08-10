@@ -1,16 +1,18 @@
 package si.f5.mitminecraft.sushida;
 
-import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
-import java.nio.file.Files;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,7 +21,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONArray;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.entity.Display.Billboard;
@@ -51,8 +52,8 @@ public class Sushida implements CommandExecutor, TabCompleter {
     public static List<String> playerOnContinue = new ArrayList<String>();
     public static Map<String, MultiPlay> playerGroupMap = new HashMap<String, MultiPlay>();
 
-    private static Map<String, String> pSentence = new HashMap<String, String>();
-    private static Map<String, String> pFullSentence = new HashMap<String, String>();
+    private static Map<String, String> playerSentence = new HashMap<String, String>();
+    private static Map<String, String> playerFullSentence = new HashMap<String, String>();
     private static Map<String, BossBar> playerBossBarMap = new HashMap<String, BossBar>();
     private static Map<String, BossBar> playerConsecutivelyBossBarMap = new HashMap<String, BossBar>();
     private static Map<String, Integer> playerConsective = new HashMap<String, Integer>();
@@ -69,21 +70,22 @@ public class Sushida implements CommandExecutor, TabCompleter {
     private static Map<String, TextDisplay> playersTextDisplay_upper = new HashMap<String, TextDisplay>();
     public static List<String> sentences = new ArrayList<String>();
     final String sentencePath = "./Sushida/sushis.json";
-    final String limitedTitle = $ccRED+"文字数の上限に達しました！";
-    final String limitedSubTitle = $ccRED+"Enter か ESC をおしてもう一度開く";
+    final String limitedTitle = $ccRED+"\u6587\u5B57\u6570\u306E\u4E0A\u9650\u306B\u9054\u3057\u307E\u3057\u305F\uFF01";
+    final String limitedSubTitle = $ccRED+"Enter \u304B ESC \u3092\u304A\u3057\u3066\u3082\u3046\u4E00\u5EA6\u958B\u304F";
+
 
     public Sushida(){
         try {
-            Files.createDirectory(Paths.get("./Sushida"));
-        } catch (IOException e){}
-        try {
-            String jsonString = new String(Files.readAllBytes(Paths.get(sentencePath)));
+            ClassLoader cl = Sushida.class.getClassLoader() ;
+            InputStream is = cl.getResourceAsStream("sushis.json");
+            BufferedReader txtReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            String jsonString =  txtReader.lines().collect(Collectors.joining());
             JSONArray jsonArray = new JSONArray(jsonString);
             for (int i = 0; i < jsonArray.length(); i++) {
                 String element = jsonArray.getString(i);
                 sentences.add(element);
             }
-        } catch (IOException e){
+        } catch (UnsupportedEncodingException e){
             e.printStackTrace();
         }
     }
@@ -93,21 +95,21 @@ public class Sushida implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
         if (isPlaying(sender.getName())){
             Player player = (Player) sender;
-            player.sendTitle(ChatColor.RED+""+ChatColor.BOLD+"/.␣ で続行", null, 0, 800, 0);
+            player.sendTitle($ccRED+""+$ccBOLD+"/.\u2423 \u3067\u7D9A\u884C", null, 0, 800, 0);
             playerOnContinue.add(sender.getName());
         }
         return true;
     }
 
-
+    
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args){
         Player player = (Player) sender;
         List<String> _candidate = new ArrayList<String>();
         String name = sender.getName();
-        String sentence = pSentence.get(name);
+        String sentence = playerSentence.get(name);
         String prevArg = playerPrevArg.get(name);
-        String letter; 
+        String letter; // Better to be Char...? length of 1 character will be contained(sender's input)
         String title;
         String input = "";
         String lowerText;
@@ -167,6 +169,9 @@ public class Sushida implements CommandExecutor, TabCompleter {
                 }
                 d++;
             } if (prevArg != null && input.length() == prevArg.length()){
+                /*
+                 * The limit of chat command character length
+                 */
                 player.sendTitle(limitedTitle, limitedSubTitle, 0, 800, 0);
                 player.playSound(player, "block.note_block.banjo", 1F, 0.5F);
                 return _candidate;
@@ -183,12 +188,12 @@ public class Sushida implements CommandExecutor, TabCompleter {
 
             final String _prevArg = input;
 
-            playerPrevArg.remove(name);   
-            playerPrevArg.put(name, _prevArg);  
+            playerPrevArg.remove(name);         // static(!this)
+            playerPrevArg.put(name, _prevArg);  // static(!this)
             if (playerOnContinue.contains(name)){
                 playerOnContinue.remove(name);
                 String subTitle = ChatColor.GRAY + playerSubTitle.get(name);
-                title = $ccGREEN + pFullSentence.get(name)
+                title = $ccGREEN + playerFullSentence.get(name)
                     .replace(sentence, "")
                     .replace(" ", $ccBOLD+"␣"+$ccRESET+$ccGREEN) + $ccWHITE + sentence;
                 player.sendTitle(title, subTitle, 0, 800, 0);
@@ -277,6 +282,7 @@ public class Sushida implements CommandExecutor, TabCompleter {
                 if (sentence.length() == 1 && _mo.equals("ん")){
                     requiredLetterL = Arrays.asList("nn");
                 } else if (_mo.equals("ん") && nextCanBeN.get(name) == null){
+                    // awaited null
                     nextCanBeN.put(name, "yes");
                 }
             }
@@ -360,8 +366,9 @@ public class Sushida implements CommandExecutor, TabCompleter {
                     }
                     letterCandidateListMap.remove(name);
                     letterCandidateListMap.put(name, saveReqL);
+                    //player.playSound((Entity) player , "block.candle.break", 1F, 0.5F); botu!
                     player.playSound((Entity) player , "entity.experience_orb.pickup", 1F, 1.2F);
-                    pSentence.remove(name);
+                    playerSentence.remove(name);
                     if (sentence.equals("")){
                         pastSentences++;
                         player.playSound((Entity) player , "entity.player.levelup", 1F, 2F);
@@ -370,7 +377,7 @@ public class Sushida implements CommandExecutor, TabCompleter {
                         letterCandidateListMap.remove(name);
                         isOnSmalltu.remove(name);
                     } else {
-                        pSentence.put(name, sentence);
+                        playerSentence.put(name, sentence);
                         subTitle = ChatColor.GRAY + playerSubTitle.get(name).replace("§f", "") + $ccWHITE + letter;
                     }
                 } else {
@@ -380,7 +387,7 @@ public class Sushida implements CommandExecutor, TabCompleter {
                     subTitle = playerSubTitle.get(name) + $ccWHITE + letter;
                 }
             }
-            String sent_c = pFullSentence.get(name);
+            String sent_c = playerFullSentence.get(name);
             double prog = Float.valueOf(consec)/Float.valueOf(50);
 
             if (prog >= 1 && playerGroupMap.get(name) == null){
@@ -407,6 +414,7 @@ public class Sushida implements CommandExecutor, TabCompleter {
             playerCounts.put(name, counts);
             currentInputFar.remove(name);
             currentInputFar.put(name, _currentSentInput);
+            // $public variable defined at `this` constructor
             title = $ccGREEN + sent_c
                 .substring(0, sent_c.length()-sentence.length())
                 .replace(" ", $ccBOLD+"␣"+$ccRESET+$ccGREEN) + $ccWHITE + sentence;
@@ -437,10 +445,10 @@ public class Sushida implements CommandExecutor, TabCompleter {
         final String sentence = sentences.get(random.nextInt(sentences.size()))
             .replace(";", ",")
             .replace(":", ",");
-                pSentence.remove(author);
-                pSentence.put(author, sentence);
-                pFullSentence.remove(author);
-                pFullSentence.put(author, sentence);
+                playerSentence.remove(author);
+                playerSentence.put(author, sentence);
+                playerFullSentence.remove(author);
+                playerFullSentence.put(author, sentence);
                 playerSubTitle.put(author, "");
         return sentence;
     }
@@ -505,10 +513,7 @@ public class Sushida implements CommandExecutor, TabCompleter {
         }.runTaskLater(Main.plugin, 120L);
     }
 
-    /**
-     * Call when player joins multiplay
-     * @param player
-     */
+
     public static void _startTyping(final Player player){
         if (player == null) return;
         final BossBar bossBar = Bukkit.createBossBar($ccGREEN+"残り時間", BarColor.GREEN, BarStyle.SOLID);
@@ -595,9 +600,7 @@ public class Sushida implements CommandExecutor, TabCompleter {
         return counts;
     }
 
-    /**
-     * Bukkit scheduled
-     */
+
     public static void removeCd(){
         List<String> removable = new ArrayList<String>();
         for (String name : playerGameMode.keySet()){
@@ -661,12 +664,6 @@ public class Sushida implements CommandExecutor, TabCompleter {
     }
 
 
-    /**
-     * Call before start a game
-     * @param name
-     * @param starter
-     * @param removeGameMode
-     */
     public static void __playerInit__(final String name, boolean starter, boolean removeGameMode){
         BossBar bossBar = playerBossBarMap.get(name);
         BossBar consective = playerConsecutivelyBossBarMap.get(name);
@@ -707,8 +704,8 @@ public class Sushida implements CommandExecutor, TabCompleter {
         playerPrevArg.remove(name);
         playerCounts.remove(name);
         playerOnContinue.remove(name);
-        pSentence.remove(name);
-        pFullSentence.remove(name);
+        playerSentence.remove(name);
+        playerFullSentence.remove(name);
         playerSubTitle.remove(name);
     }
 
@@ -1059,10 +1056,7 @@ public class Sushida implements CommandExecutor, TabCompleter {
 
 
 
-/**
- * Party constructor
- */
-class MultiPlay{
+class MultiPlay {
     private List<Player> members = new ArrayList<Player>();
     public boolean resultSent = false;
 

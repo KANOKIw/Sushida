@@ -23,6 +23,6 @@ public class Main extends JavaPlugin {
 		getCommand("typing").setExecutor(new Sushida());
         getCommand("entyping").setExecutor(new Engda());
         getCommand("sushida").setExecutor(new Start());
-        getLogger().info("< Sushida loaded >");
+        getLogger().info("< Sushida loaded!! >");
     }
 }

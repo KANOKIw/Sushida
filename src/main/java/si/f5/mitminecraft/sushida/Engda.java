@@ -1,15 +1,16 @@
 package si.f5.mitminecraft.sushida;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Random;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -60,23 +61,22 @@ public class Engda implements CommandExecutor, TabCompleter {
     private static Map<String, TextDisplay> playersTextDisplay_lower = new HashMap<String, TextDisplay>();
     private static Map<String, TextDisplay> playersTextDisplay_upper = new HashMap<String, TextDisplay>();
     public static List<String> sentences = new ArrayList<String>();
-    final String sentencePath = "./Sushida/sentences.json";
     final String limitedTitle = $ccRED+"Character limit reached!!";
     final String limitedSubTitle = $ccRED+"Pree Enter or ESC to continue";
 
     public Engda(){
         try {
-            Files.createDirectory(Paths.get("./Sushida"));
-        } catch (IOException e){}
-        try {
-            String jsonString = new String(Files.readAllBytes(Paths.get(sentencePath)));
+            ClassLoader cl = Sushida.class.getClassLoader() ;
+            InputStream is = cl.getResourceAsStream("sentences.json");
+            BufferedReader txtReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            String jsonString =  txtReader.lines().collect(Collectors.joining());
             JSONArray jsonArray = new JSONArray(jsonString);
             for (int i = 0; i < jsonArray.length(); i++) {
                 String element = jsonArray.getString(i);
                 sentences.add(element);
             }
-        } catch (IOException e){
-            e.printStackTrace();            
+        } catch (UnsupportedEncodingException e){
+            e.printStackTrace();
         }
     }
 
@@ -85,22 +85,13 @@ public class Engda implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
         if (isPlaying(sender.getName())){
             Player player = (Player) sender;
-            player.sendTitle(ChatColor.RED+""+ChatColor.BOLD+"/_␣ で続行", null, 0, 800, 0);
+            player.sendTitle($ccRED+""+$ccBOLD+"/_␣ で続行", null, 0, 800, 0);
             playerOnContinue.add(sender.getName());
         }
         return true;
     }
 
-    /**
-     * @param sender
-     *              Source of the command
-     * @param command
-     *              Command which was executed
-     * @parm alias
-     *              Alias of the command which was used
-     * @parm args
-     *              The arguments passed to the command, including final partial argument to be completed
-     */
+    
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args){
         Player player = (Player) sender;
