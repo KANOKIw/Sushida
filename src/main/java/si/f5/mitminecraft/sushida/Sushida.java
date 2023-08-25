@@ -39,6 +39,7 @@ public class Sushida implements CommandExecutor, TabCompleter {
     final public static ChatColor $ccGOLD = ChatColor.GOLD;
     final public static ChatColor $ccWHITE = ChatColor.WHITE;
     final public static ChatColor $ccLIGHT_PURPLE = ChatColor.LIGHT_PURPLE;
+    final public static ChatColor $ccAQUA = ChatColor.AQUA;
     final public static ChatColor $ccBOLD = ChatColor.BOLD;
     final public static ChatColor $ccRESET = ChatColor.RESET;
 
@@ -203,9 +204,24 @@ public class Sushida implements CommandExecutor, TabCompleter {
                 return _candidate;
             }
             if (sentence == null){
+                final TextDisplay _text_display_lower = playersTextDisplay_lower.get(name);
+                final TextDisplay _text_display_upper = playersTextDisplay_upper.get(name);
+                String _lowerText = $ccLIGHT_PURPLE+"score: 0"
+                    +$ccWHITE+" ("+$ccGREEN+""+$ccBOLD+"✓"+$ccRESET+""+$ccGREEN+"0 "
+                    +$ccRED+"✗0"+$ccWHITE+")";
                 sentence = newSentence(name);
                 player.playSound(player, "entity.player.levelup", 1F, 2F);
                 setup = true;
+                if (_text_display_lower != null && _text_display_upper != null){
+                    _text_display_lower
+                        .setText($ccWHITE+sentence);
+                    _text_display_lower
+                        .teleport(player.getLocation().add(0, 2.4d, 0));
+                    _text_display_upper
+                        .setText(_lowerText);
+                    _text_display_upper
+                        .teleport(player.getLocation().add(0, 2.7d, 0));
+                }
             }
 
             List<String> requiredLetterL = letterCandidateListMap.get(name);
@@ -422,13 +438,17 @@ public class Sushida implements CommandExecutor, TabCompleter {
             lowerText = $ccLIGHT_PURPLE+"score: "+pastSentences*120
                 +$ccWHITE+" ("+$ccGREEN+""+$ccBOLD+"✓"+$ccRESET+""+$ccGREEN+correct+" "
                 +$ccRED+"✗"+miss+$ccWHITE+")";
-            TextDisplay text_display_lower = playersTextDisplay_lower.get(name);
-            TextDisplay text_display_upper = playersTextDisplay_upper.get(name);
+            final TextDisplay text_display_lower = playersTextDisplay_lower.get(name);
+            final TextDisplay text_display_upper = playersTextDisplay_upper.get(name);
             if (text_display_lower != null && text_display_upper != null){
-                text_display_lower.setText(lowerText);
-                text_display_lower.teleport(player.getLocation().add(0, 2.4d, 0));
-                text_display_upper.setText(title);
-                text_display_upper.teleport(player.getLocation().add(0, 2.7d, 0));
+                text_display_lower
+                    .setText(lowerText);
+                text_display_lower
+                    .teleport(player.getLocation().add(0, 2.4d, 0));
+                text_display_upper
+                    .setText(title);
+                text_display_upper
+                    .teleport(player.getLocation().add(0, 2.7d, 0));
             }
         }
         return _candidate;
@@ -457,6 +477,9 @@ public class Sushida implements CommandExecutor, TabCompleter {
     private void startTyping(final Player player){
         final BossBar bossBar = Bukkit.createBossBar($ccGREEN+"残り時間", BarColor.GREEN, BarStyle.SOLID);
         final BossBar consecutive = Bukkit.createBossBar($ccGOLD+"連打メーター", BarColor.RED, BarStyle.SEGMENTED_20);
+        final String _lowerText = $ccLIGHT_PURPLE+"score: 0"
+            +$ccWHITE+" ("+$ccGREEN+""+$ccBOLD+"✓"+$ccRESET+""+$ccGREEN+"0 "
+            +$ccRED+"✗0"+$ccWHITE+")";
 
         bossBar.setVisible(true);
         bossBar.addPlayer(player);
@@ -467,12 +490,37 @@ public class Sushida implements CommandExecutor, TabCompleter {
         playerConsecutivelyBossBarMap.put(player.getName(), consecutive);
         player.sendTitle("3...", null, 0, 40, 0);
         player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+        TextDisplay text_display_lower = player.getLocation()
+            .getWorld()
+            .spawn(
+                player.getLocation().add(0, 2.4d, 0),
+                TextDisplay.class
+                );
+        TextDisplay text_display_upper = player.getLocation()
+            .getWorld()
+            .spawn(
+                player.getLocation().add(0, 2.7d, 0),
+                TextDisplay.class
+                );
+        text_display_lower.setBillboard(Billboard.CENTER);
+        text_display_lower.setText(_lowerText);
+        text_display_upper.setBillboard(Billboard.CENTER);
+        text_display_upper.setText($ccGREEN+"3...");
+        playersTextDisplay_lower.put(player.getName(), text_display_lower);
+        playersTextDisplay_upper.put(player.getName(), text_display_upper);
 
         new BukkitRunnable(){
             @Override
             public void run(){
                 player.sendTitle("2...", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"2...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 40L);
@@ -481,6 +529,13 @@ public class Sushida implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("1...", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"1...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 80L);
@@ -492,20 +547,23 @@ public class Sushida implements CommandExecutor, TabCompleter {
                 String sentence = newSentence(player.getName());
                 player.sendTitle($ccWHITE+sentence, null, 0, 800, 0);
                 player.playSound(player, "entity.player.levelup", 1F, 0.5F);
+
                 TextDisplay text_display_lower = player.getLocation()
                     .getWorld()
                     .spawn(
-                        player.getLocation(),
+                        player.getLocation().add(0, 2.4d, 0),
                         TextDisplay.class
                         );
                 TextDisplay text_display_upper = player.getLocation()
                     .getWorld()
                     .spawn(
-                        player.getLocation(),
+                        player.getLocation().add(0, 2.7d, 0),
                         TextDisplay.class
                         );
                 text_display_lower.setBillboard(Billboard.CENTER);
+                text_display_lower.setText(_lowerText);
                 text_display_upper.setBillboard(Billboard.CENTER);
+                text_display_upper.setText($ccWHITE+sentence);
                 playersTextDisplay_lower.put(player.getName(), text_display_lower);
                 playersTextDisplay_upper.put(player.getName(), text_display_upper);
                 this.cancel();
@@ -517,6 +575,9 @@ public class Sushida implements CommandExecutor, TabCompleter {
     public static void _startTyping(final Player player){
         if (player == null) return;
         final BossBar bossBar = Bukkit.createBossBar($ccGREEN+"残り時間", BarColor.GREEN, BarStyle.SOLID);
+        final String _lowerText = $ccLIGHT_PURPLE+"score: 0"
+            +$ccWHITE+" ("+$ccGREEN+""+$ccBOLD+"✓"+$ccRESET+""+$ccGREEN+"0 "
+            +$ccRED+"✗0"+$ccWHITE+")";
 
         bossBar.setVisible(true);
         onMulti.add(player.getName());
@@ -530,6 +591,25 @@ public class Sushida implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("4..."+$ccGREEN+" "+$ccBOLD+"/.␣ でプレイ", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+
+                TextDisplay text_display_lower = player.getLocation()
+                    .getWorld()
+                    .spawn(
+                        player.getLocation().add(0, 2.4d, 0),
+                        TextDisplay.class
+                        );
+                TextDisplay text_display_upper = player.getLocation()
+                    .getWorld()
+                    .spawn(
+                        player.getLocation().add(0, 2.7d, 0),
+                        TextDisplay.class
+                        );
+                text_display_lower.setBillboard(Billboard.CENTER);
+                text_display_lower.setText(_lowerText);
+                text_display_upper.setBillboard(Billboard.CENTER);
+                text_display_upper.setText($ccGREEN+"4...");
+                playersTextDisplay_lower.put(player.getName(), text_display_lower);
+                playersTextDisplay_upper.put(player.getName(), text_display_upper);
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 100L);
@@ -538,6 +618,13 @@ public class Sushida implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("3..."+$ccGREEN+" "+$ccBOLD+"/.␣ でプレイ", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"3...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 140L);
@@ -546,6 +633,13 @@ public class Sushida implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("2..."+$ccGREEN+" "+$ccBOLD+"/.␣ でプレイ", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"2...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+                    
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 180L);
@@ -554,6 +648,13 @@ public class Sushida implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("1..."+$ccGREEN+" "+$ccBOLD+"/.␣ でプレイ", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"1...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+                    
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 220L);
@@ -569,17 +670,19 @@ public class Sushida implements CommandExecutor, TabCompleter {
                 TextDisplay text_display_lower = player.getLocation()
                     .getWorld()
                     .spawn(
-                        player.getLocation(),
+                        player.getLocation().add(0, 2.4d, 0),
                         TextDisplay.class
                         );
                 TextDisplay text_display_upper = player.getLocation()
                     .getWorld()
                     .spawn(
-                        player.getLocation(),
+                        player.getLocation().add(0, 2.7d, 0),
                         TextDisplay.class
                         );
                 text_display_lower.setBillboard(Billboard.CENTER);
+                text_display_lower.setText(_lowerText);
                 text_display_upper.setBillboard(Billboard.CENTER);
+                text_display_upper.setText($ccWHITE+sentence);
                 playersTextDisplay_lower.put(player.getName(), text_display_lower);
                 playersTextDisplay_upper.put(player.getName(), text_display_upper);
                 this.cancel();
@@ -1051,47 +1154,5 @@ public class Sushida implements CommandExecutor, TabCompleter {
             l.add(".");
         }
         return l;
-    }
-}
-
-
-
-class MultiPlay {
-    private List<Player> members = new ArrayList<Player>();
-    public boolean resultSent = false;
-
-    MultiPlay(List<String> players){
-        for (String player : players){
-            Player _player = Main.plugin.getServer().getPlayer(player);
-            if (_player != null){
-                members.add(_player);
-            }
-        }
-    }
-
-
-    public void sendResult(){
-        List<String> messageList = new ArrayList<String>();
-        for (Player player : members){
-            List<Integer> counts = Sushida.getCounts(player.getName());
-            String result = Sushida.$ccGREEN+player.getName()
-                +Sushida.$ccYELLOW+" ... "
-                +Sushida.$ccLIGHT_PURPLE+counts.get(2)*240;
-            messageList.add(result);
-        }
-        for (Player player : members){
-            player.sendMessage(
-                ChatColor.BLUE+""+ChatColor.BOLD+""+ChatColor.STRIKETHROUGH+"-----------------------------------"
-            );
-            player.sendMessage(
-                ChatColor.BLUE+""+ChatColor.BOLD+""+ChatColor.GOLD+"Game ended!!"
-            );
-            for (String message: messageList){
-                player.sendMessage(message);
-            }
-            player.sendMessage(
-                ChatColor.BLUE+""+ChatColor.BOLD+""+ChatColor.STRIKETHROUGH+"-----------------------------------"
-            );
-        }
     }
 }

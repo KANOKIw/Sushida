@@ -245,16 +245,46 @@ public class Engda implements CommandExecutor, TabCompleter {
 
     private void startTyping(final Player player){
         final BossBar bossBar = Bukkit.createBossBar($ccGREEN+"残り時間", BarColor.GREEN, BarStyle.SOLID);
+        final String _lowerText = $ccLIGHT_PURPLE+"score: 0"
+            +$ccWHITE+" ("+$ccGREEN+""+$ccBOLD+"✓"+$ccRESET+""+$ccGREEN+"0 "
+            +$ccRED+"✗0"+$ccWHITE+")";
+
         bossBar.setVisible(true);
         bossBar.addPlayer(player);
         playerBossBarMap.put(player.getName(), bossBar);
         player.sendTitle("3...", null, 0, 40, 0);
         player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+        TextDisplay text_display_lower = player.getLocation()
+            .getWorld()
+            .spawn(
+                player.getLocation().add(0, 2.4d, 0),
+                TextDisplay.class
+                );
+        TextDisplay text_display_upper = player.getLocation()
+            .getWorld()
+            .spawn(
+                player.getLocation().add(0, 2.7d, 0),
+                TextDisplay.class
+                );
+        text_display_lower.setBillboard(Billboard.CENTER);
+        text_display_lower.setText(_lowerText);
+        text_display_upper.setBillboard(Billboard.CENTER);
+        text_display_upper.setText($ccGREEN+"3...");
+        playersTextDisplay_lower.put(player.getName(), text_display_lower);
+        playersTextDisplay_upper.put(player.getName(), text_display_upper);
+
         new BukkitRunnable(){
             @Override
             public void run(){
                 player.sendTitle("2...", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"2...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 40L);
@@ -263,6 +293,13 @@ public class Engda implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("1...", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"1...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 80L);
@@ -287,7 +324,9 @@ public class Engda implements CommandExecutor, TabCompleter {
                         TextDisplay.class
                         );
                 text_display_lower.setBillboard(Billboard.CENTER);
+                text_display_lower.setText(_lowerText);
                 text_display_upper.setBillboard(Billboard.CENTER);
+                text_display_upper.setText($ccWHITE+sentence);
                 playersTextDisplay_lower.put(player.getName(), text_display_lower);
                 playersTextDisplay_upper.put(player.getName(), text_display_upper);
                 this.cancel();
@@ -299,6 +338,10 @@ public class Engda implements CommandExecutor, TabCompleter {
     public static void _startTyping(final Player player){
         if (player == null) return;
         final BossBar bossBar = Bukkit.createBossBar($ccGREEN+"残り時間", BarColor.GREEN, BarStyle.SOLID);
+        final String _lowerText = $ccLIGHT_PURPLE+"score: 0"
+            +$ccWHITE+" ("+$ccGREEN+""+$ccBOLD+"✓"+$ccRESET+""+$ccGREEN+"0 "
+            +$ccRED+"✗0"+$ccWHITE+")";
+
         bossBar.setVisible(true);
         onMulti.add(player.getName());
         bossBar.addPlayer(player);
@@ -310,6 +353,25 @@ public class Engda implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("4..."+$ccGREEN+" "+$ccBOLD+"/_␣ でプレイ", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                
+                TextDisplay text_display_lower = player.getLocation()
+                    .getWorld()
+                    .spawn(
+                        player.getLocation().add(0, 2.4d, 0),
+                        TextDisplay.class
+                        );
+                TextDisplay text_display_upper = player.getLocation()
+                    .getWorld()
+                    .spawn(
+                        player.getLocation().add(0, 2.7d, 0),
+                        TextDisplay.class
+                        );
+                text_display_lower.setBillboard(Billboard.CENTER);
+                text_display_lower.setText(_lowerText);
+                text_display_upper.setBillboard(Billboard.CENTER);
+                text_display_upper.setText($ccGREEN+"4...");
+                playersTextDisplay_lower.put(player.getName(), text_display_lower);
+                playersTextDisplay_upper.put(player.getName(), text_display_upper);
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 100L);
@@ -318,6 +380,13 @@ public class Engda implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("3..."+$ccGREEN+" "+$ccBOLD+"/_␣ でプレイ", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"3...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 140L);
@@ -326,6 +395,13 @@ public class Engda implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("2..."+$ccGREEN+" "+$ccBOLD+"/_␣ でプレイ", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"2...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+                    
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 180L);
@@ -334,6 +410,13 @@ public class Engda implements CommandExecutor, TabCompleter {
             public void run(){
                 player.sendTitle("1..."+$ccGREEN+" "+$ccBOLD+"/_␣ でプレイ", null, 0, 40, 0);
                 player.playSound(player, "block.beacon.power_select", 1F, 1.5F);
+                try{
+                    playersTextDisplay_upper.get(player.getName()).setText($ccGREEN+"1...");
+                    playersTextDisplay_upper.get(player.getName()).teleport(player.getLocation().add(0, 2.7d, 0));
+                    playersTextDisplay_lower.get(player.getName()).teleport(player.getLocation().add(0, 2.4d, 0));
+                }catch(NullPointerException e){
+                    
+                }
                 this.cancel();
             }
         }.runTaskLater(Main.plugin, 220L);
@@ -359,7 +442,9 @@ public class Engda implements CommandExecutor, TabCompleter {
                         TextDisplay.class
                         );
                 text_display_lower.setBillboard(Billboard.CENTER);
+                text_display_lower.setText(_lowerText);
                 text_display_upper.setBillboard(Billboard.CENTER);
+                text_display_upper.setText($ccWHITE+sentence);
                 playersTextDisplay_lower.put(player.getName(), text_display_lower);
                 playersTextDisplay_upper.put(player.getName(), text_display_upper);
                 this.cancel();
@@ -473,47 +558,5 @@ public class Engda implements CommandExecutor, TabCompleter {
         playerSentence.remove(name);
         playerFullSentence.remove(name);
         playerSubTitle.remove(name);
-    }
-}
-
-
-
-class MultiPlay{
-    private List<Player> members = new ArrayList<Player>();
-    public boolean resultSent = false;
-
-    MultiPlay(List<String> players){
-        for (String player : players){
-            Player _player = Main.plugin.getServer().getPlayer(player);
-            if (_player != null){
-                members.add(_player);
-            }
-        }
-    }
-
-
-    public void sendResult(){
-        List<String> messageList = new ArrayList<String>();
-        for (Player player : members){
-            List<Integer> counts = Sushida.getCounts(player.getName());
-            String result = Sushida.$ccGREEN+player.getName()
-                +Sushida.$ccYELLOW+" ... "
-                +Sushida.$ccLIGHT_PURPLE+counts.get(2)*240;
-            messageList.add(result);
-        }
-        for (Player player : members){
-            player.sendMessage(
-                ChatColor.BLUE+""+ChatColor.BOLD+""+ChatColor.STRIKETHROUGH+"-----------------------------------"
-            );
-            player.sendMessage(
-                ChatColor.BLUE+""+ChatColor.BOLD+""+ChatColor.GOLD+"Game ended!!"
-            );
-            for (String message: messageList){
-                player.sendMessage(message);
-            }
-            player.sendMessage(
-                ChatColor.BLUE+""+ChatColor.BOLD+""+ChatColor.STRIKETHROUGH+"-----------------------------------"
-            );
-        }
     }
 }

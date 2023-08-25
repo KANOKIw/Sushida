@@ -29,7 +29,7 @@ public class Start implements CommandExecutor, TabCompleter {
         }
         
         if (args.length > 4){
-            if (__sessions__.contains(args[2])){
+            if (__sessions__.contains(args[3])){
                 sender.sendMessage(ChatColor.RED+"無効なセッションです！");
                 return true;
             }
@@ -143,11 +143,12 @@ public class Start implements CommandExecutor, TabCompleter {
                     player.sendMessage(Engda.$ccGREEN+"Score: "+Engda.playerCounts.get(sender.getName()).get(2)*120+", "+result);
                 }
             } catch (NullPointerException e){
+
             } finally {
                 Sushida.__playerInit__(sender.getName(), false, true);
-                sender.sendMessage(ChatColor.RED+"ゲームを終了しました。");
                 Engda.__playerInit__(sender.getName(), false, true);
                 sender.sendMessage(ChatColor.RED+"ゲームを終了しました。");
+                player.resetTitle();
             }
         } else if (args[0].equals("get")){
             sender.sendMessage(Sushida.playerGameMode.toString());

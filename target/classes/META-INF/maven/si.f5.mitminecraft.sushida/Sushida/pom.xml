@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>si.f5.mitminecraft.sushida</groupId>
   <artifactId>Sushida</artifactId>
-  <version>0.0.6</version>
+  <version>0.0.7</version>
   <name>Sushida</name>
   <build>
    <plugins>
@@ -44,6 +44,8 @@
      <groupId>org.spigotmc</groupId>
      <artifactId>spigot-api</artifactId>
      <version>1.20.1-R0.1-SNAPSHOT</version>
+     <type>jar</type>
+     <scope>provided</scope>
    </dependency>
    <dependency>
        <groupId>org.json</groupId>
